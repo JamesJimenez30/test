@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Page</title>
+    <style>
+        /* CSS Variables for easy theming */
+        :root {
+            --primary-color: #9370db;
+            --secondary-color: #ba55d3;
+            --accent-color: #8a2be2;
+            --light-bg: rgba(248, 248, 255, 0.95);
+            --error-color: #8b0000;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --border-radius: 20px;
+            --transition: all 0.5s ease;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #b19cd9, var(--primary-color));
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            background: var(--light-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            transition: var(--transition);
+            z-index: 1;
+            /* Improved layout with Flexbox for better centering */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1, h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        p {
+            color: var(--secondary-color);
+            font-size: 18px;
+            line-height: 1.6;
+            margin: 0 0 20px 0;
+        }
+
+        .guide {
+            font-size: 14px;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        input[type="password"] {
+            padding: 12px;
+            border: 2px solid #e6e6fa;
+            border-radius: 10px;
+            font-size: 18px;
+            text-align: center;
+            width: 120px;
+            margin: 20px 0;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="password"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            margin: 10px;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        button:focus {
+            outline: 2px solid var(--secondary-color);
+        }
+
+        .no-button {
+            position: relative;
+        }
+
+        .error {
+            color: var(--error-color);
+            font-size: 16px;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error.show {
+            opacity: 1;
+        }
+
+        .hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 24px;
+            color: var(--primary-color);
+            animation: bounce 2.5s ease-in-out infinite;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .heart.show {
+            opacity: 1;
+        }
+
+        /* Original hearts (1-10) scattered across */
+        .heart:nth-child(1) { left: 5%; top: 10%; animation-delay: 0s; }
+        .heart:nth-child(2) { left: 15%; top: 20%; animation-delay: 0.5s; }
+        .heart:nth-child(3) { left: 25%; top: 30%; animation-delay: 1s; }
+        .heart:nth-child(4) { left: 35%; top: 15%; animation-delay: 0.3s; }
+        .heart:nth-child(5) { left: 45%; top: 25%; animation-delay: 0.8s; }
+        .heart:nth-child(6) { left: 55%; top: 35%; animation-delay: 1.2s; }
+        .heart:nth-child(7) { left: 65%; top: 10%; animation-delay: 0.4s; }
+        .heart:nth-child(8) { left: 75%; top: 20%; animation-delay: 0.9s; }
+        .heart:nth-child(9) { left: 85%; top: 30%; animation-delay: 1.4s; }
+        .heart:nth-child(10) { left: 95%; top: 15%; animation-delay: 1.5s; }
+
+        /* New white hearts (11-19) scattered at the bottom */
+        .heart:nth-child(11) { left: 10%; top: 75%; animation-delay: 0.2s; }
+        .heart:nth-child(12) { left: 20%; top: 80%; animation-delay: 0.6s; }
+        .heart:nth-child(13) { left: 30%; top: 85%; animation-delay: 1.1s; }
+        .heart:nth-child(14) { left: 40%; top: 70%; animation-delay: 0.7s; }
+        .heart:nth-child(15) { left: 50%; top: 90%; animation-delay: 1.3s; }
+        .heart:nth-child(16) { left: 60%; top: 75%; animation-delay: 0.9s; }
+        .heart:nth-child(17) { left: 70%; top: 85%; animation-delay: 1.6s; }
+        .heart:nth-child(18) { left: 80%; top: 80%; animation-delay: 0.4s; }
+        .heart:nth-child(19) { left: 90%; top: 95%; animation-delay: 1.8s; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        form {
+            display: none;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: var(--shadow);
+        }
+
+        /* New: Loading spinner for transitions */
+        .loading {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* New: Music toggle button */
+        #music-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                max-width: 95%;
+            }
+            h1, h2 {
+                font-size: 24px;
+            }
+            p {
+                font-size: 16px;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- New: Optional music toggle -->
+    <button id="music-toggle" onclick="toggleMusic()">🎵</button>
+
+    <div class="container" id="password-screen">
+        <h1>Enter the Secret Code</h1>
+        <input type="password" id="code" maxlength="4" placeholder="****" aria-label="Secret code input">
+        <br>
+        <button onclick="checkCode()">Submit</button>
+        <div class="error" id="error"></div>
+    </div>
+
+    <div class="container hidden" id="proposal-screen">
+        <h1>Hi mayang🤗</h1>
+        <p>Are you free tomorrow? I was hoping I could invite you out po… because lately, you’ve been on my mind a lot.
+I just really want to see you po, even if it’s only for a little while 🤍</p>
+        <div class="guide">Click 'Yes' if you're excited to go out! Click 'No' if you need more time to think.</div>
+        <button onclick="sayYes()">Yes</button>
+        <button onclick="sayNo()">No</button>
+    </div>
+
+    <div class="container hidden" id="confirmation-screen">
+        <h2>Are You Sure po?🤨</h2>
+        <p>kung na tingala or na suko kw ngano wla ako nka chat po... tag deact..nko ako account gikn po😶...then nag himo ako ani nga web...and one of the reason po is exam so gusto lang nko nga dili ma disturb ug di mka disturb sa imo po</p>
+        <div class="guide">Still thinking? 'Yes' means you're in! 'No' will give you another chance to say yes.</div>
+        <button onclick="confirmYes()">Yes</button>
+        <button onclick="confirmNo()">No</button>
+    </div>
+
+    <div class="container hidden" id="begging2-screen">
+        <h2>Please?🥺</h2>
+        <p>Please bisan kadali lang po??
+        mag icecream mn ta Hhehehe</p>
+        <div class="guide">'Yes' to make my day! 'No' might move around—try to catch it if you're sure.</div>
+        <button onclick="begging2Yes()">Yes</button>
+        <button class="no-button" id="moving-no" onclick="begging2No()">No</button>
+    </div>
+
+    <div class="container hidden" id="begging3-screen">
+        <h2>Last Chance?🥹🥹</h2>
+        <p></p>
+        <div class="guide">huhu Please? :(</div>
+        <button onclick="begging3Yes()">Yes</button>
+        <button onclick="finalNo()">No</button>
+    </div>
+
+    <div class="container hidden" id="images-screen">
+        <h2>Yay!Hehheheh Here is a special memory for you 💕</h2>
+        <!-- Single photo -->
+        <img src="https://via.placeholder.com/300x200/9370db/ffffff?text=Our+First+Memory" alt="Special Memory">
+        <div class="guide">Click 'Next' to confirm and plan our date!</div>
+        <button onclick="nextStep()">Next</button>
+    </div>
+
+    <!-- New: Loading indicator -->
+    <div class="loading" id="loading"></div>
+
+    <div class="hearts">
+        <!-- Original 10 hearts -->
+        <div class="heart">❤️</div>
+        <div class="heart">💖</div>
+        <div class="heart">💕</div>
+        <div class="heart">🤍</div>
+        <div class="heart">💓</div>
+        <div class="heart">💞</div>
+        <div class="heart">💘</div>
+        <div class="heart">💝</div>
+        <div class="heart">💟</div>
+        <div class="heart">💜</div>
+        <!-- New 9 white hearts scattered at the bottom -->
+        <div class="heart">🤍</div>
+        <div class="heart">🤍</div>
+        <div class="heart">💜</div>
+        <div class="heart">🤍</div>
+        <div class="heart">🤗</div>
+        <div class="heart">🤍</div>
+        <div class="heart">💜</div>
+        <div class="heart">🤍</div>
+        <div class="heart">🩷</div>
+    </div>
+
+    <form id="yes-form" action="https://formspree.io/f/xqelolyz" method="POST">
+        <input type="hidden" name="response" value="Yes">
+    </form>
+    <form id="no-form" action="https://formspree.io/f/xqelolyz" method="POST">
+        <input type="hidden" name="response" value="No">
+    </form>
+
+    <!-- Updated: Audio element for background music (romantic and casual) -->
+    <audio id="bg-music" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-littleidea.mp3" type="audio/mpeg"> <!-- Romantic casual track: "Little Idea" by Bensound (free for personal use) -->
+    </audio>
+
+    <script>
+        // Global variables for better organization
+        const screens = ['password-screen', 'proposal-screen', 'confirmation-screen', 'begging2-screen', 'begging3-screen', 'images-screen'];
+        let currentScreen = 'password-screen';
+
+        function showScreen(screenId) {
+            // Hide all screens and show loading briefly for smooth transitions
+            screens.forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('loading').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById(screenId).classList.remove('hidden');
+                currentScreen = screenId;
+            }, 500);
+        }
+
+        function checkCode() {
+            const code = document.getElementById('code').value;
+            const errorEl = document.getElementById('error');
+            if (code === '1124') {
+                showScreen('proposal-screen');
+                showHearts();
+            } else {
+                errorEl.textContent = 'Wrong code! Try again.';
+                errorEl.classList.add('show');
+                setTimeout(() => errorEl.classList.remove('show'), 3000); // Auto-hide error
+            }
+        }
+
+        function showHearts() {
+            const hearts = document.querySelectorAll('.heart');
+            hearts.forEach(heart => heart.classList.add('show'));
+        }
+
+        function sayYes() { showScreen('images-screen'); }
+        function nextStep() {
+            document.getElementById('yes-form').submit();
+            alert('Yay! I\'m so excited! See u soon po. 💕🤍');
+        }
+        function sayNo() { showScreen('confirmation-screen'); }
+        function confirmYes() { showScreen('images-screen'); }
+        function confirmNo() { showScreen('begging2-screen'); }
+        function begging2Yes() { showScreen('images-screen'); }
+        function begging2No() { showScreen('begging3-screen'); }
+        function begging3Yes() { showScreen('images-screen'); }
+        function finalNo() {
+            document.getElementById('no-form').submit();
+            alert('I understand po since you’re busy. since No hard feelings! Take care. 🤗');
+        }
+
+        // Improved moving No button: Limits movement to prevent frustration
+        let moveCount = 0;
+        document.getElementById('moving-no').addEventListener('mouseover', function() {
+            if (moveCount < 5) { // Limit to 5 moves
+                const button = this;
+                const container = button.parentElement;
+                const containerRect = container.getBoundingClientRect();
+                const buttonRect = button.getBoundingClientRect();
+                const maxX = containerRect.width - buttonRect.width;
+                const maxY = containerRect.height - buttonRect.height;
+                const randomX = Math.random() * maxX;
+                const randomY = Math.random() * maxY;
+                button.style.position = 'absolute';
+                button.style.left = randomX + 'px';
+                button.style.top = randomY + 'px';
+                moveCount++;
+            }
+        });
+
+        // New: Music toggle function
+        let musicPlaying = false;
+        function toggleMusic() {
+            const audio = document.getElementById('bg-music');
+            if (musicPlaying) {
+                audio.pause();
+                document.getElementById('music-toggle').textContent = '🎵';
+            } else {
+                audio.play();
+                document.getElementById('music-toggle').textContent = '🔇';
+            }
+            musicPlaying = !musicPlaying;
+        }
+
+        // New: Keyboard support for accessibility
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && currentScreen === 'password-screen') {
+                checkCode();
+            }
+        });
+    </script>
+</body>
+</html>
